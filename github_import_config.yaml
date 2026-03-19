@@ -1,0 +1,68 @@
+# GitHub Task Importer Configuration
+# Configure which repositories to import issues from
+
+repositories:
+  # Popular Python repositories
+  - owner: python
+    repo: cpython
+    labels: []
+    limit: 5
+
+  - owner: psf
+    repo: requests
+    labels: [bug, enhancement]
+    limit: 5
+
+  # AI/ML repositories
+  - owner: langchain-ai
+    repo: langchain
+    labels: [bug, feature]
+    limit: 5
+
+  - owner: openai
+    repo: openai-python
+    labels: []
+    limit: 5
+
+  # Developer tools
+  - owner: microsoft
+    repo: vscode
+    labels: [bug, enhancement, feature]
+    limit: 5
+
+  # Web frameworks
+  - owner: pallets
+    repo: flask
+    labels: []
+    limit: 5
+
+  - owner: django
+    repo: django
+    labels: []
+    limit: 5
+
+# Import settings
+settings:
+  posted_by: "github_importer"
+  auto_approve: false  # Require manual review before publishing
+
+# Skill mapping for labels
+skill_mapping:
+  bug: "debugging"
+  documentation: "writing"
+  enhancement: "development"
+  feature: "development"
+  refactor: "refactoring"
+  test: "testing"
+  translation: "translation"
+  ui: "design"
+  api: "api"
+
+# Reward calculation settings
+reward_settings:
+  base_reward: 50.0
+  comment_bonus: 10.0  # Bonus per comment
+  label_bonus: 30.0    # Bonus for high-effort labels
+  length_bonus: 0.01   # Bonus per character
+  min_reward: 50.0
+  max_reward: 500.0
