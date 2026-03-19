@@ -107,7 +107,7 @@ class StateManager:
         conn.close()
 
     def save_agent(self, agent_data: Dict[str, Any]) -> bool:
-        """保存或更新 Agent"""
+        """Save or update Agent"""
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
@@ -116,7 +116,7 @@ class StateManager:
                 """
                 INSERT OR REPLACE INTO agents
                 (id, name, skills, capabilities, status, current_task, tasks_completed, total_earned, karma, rating, rating_count, created_at, last_active, registered_by, platform)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
                 (
                     agent_data.get("id"),
@@ -139,7 +139,7 @@ class StateManager:
             conn.commit()
             return True
         except Exception as e:
-            print(f"保存 Agent 失败: {e}")
+            print(f"Failed to save Agent: {e}")
             return False
         finally:
             conn.close()

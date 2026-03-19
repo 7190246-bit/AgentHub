@@ -1,17 +1,17 @@
 """
-AgentHub Command Registry - 命令注册表
+AgentHub Command Registry - Command Registry
 """
 
 from typing import Dict, Callable, List
 
-# 命令类型常量
+# Command type constants
 READ = "read"
 WRITE = "write"
 META = "meta"
 
 
 class Command:
-    """命令定义"""
+    """Command definition"""
 
     def __init__(
         self,
@@ -30,7 +30,7 @@ class Command:
         self.examples = examples or []
 
     def to_dict(self) -> Dict:
-        """转换为字典"""
+        """Convert to dictionary"""
         return {
             "name": self.name,
             "description": self.description,
@@ -41,59 +41,59 @@ class Command:
 
 
 class CommandRegistry:
-    """命令注册表"""
+    """Command registry"""
 
     def __init__(self):
         self.commands: Dict[str, Command] = {}
 
     def register(self, command: Command):
-        """注册命令"""
+        """Register command"""
         self.commands[command.name] = command
 
     def get_command(self, name: str) -> Command:
-        """获取命令"""
+        """Get command by name"""
         return self.commands.get(name)
 
     def get_commands_by_type(self, command_type: str) -> List[Command]:
-        """按类型获取命令列表"""
+        """Get commands by type"""
         return [
             cmd for cmd in self.commands.values() if cmd.command_type == command_type
         ]
 
     def get_all_commands(self) -> List[Command]:
-        """获取所有命令"""
+        """Get all commands"""
         return list(self.commands.values())
 
     def get_help(self) -> str:
-        """获取帮助信息"""
-        lines = ["AgentHub 可用命令：", ""]
-        lines.append("元操作命令：")
+        """Get help information"""
+        lines = ["Available AgentHub commands:", ""]
+        lines.append("Meta commands:")
         for cmd in self.get_commands_by_type(META):
             lines.append(f"  /{cmd.name} - {cmd.description}")
         lines.append("")
-        lines.append("只读命令：")
+        lines.append("Read commands:")
         for cmd in self.get_commands_by_type(READ):
             lines.append(f"  /{cmd.name} - {cmd.description}")
         lines.append("")
-        lines.append("写命令：")
+        lines.append("Write commands:")
         for cmd in self.get_commands_by_type(WRITE):
             lines.append(f"  /{cmd.name} - {cmd.description}")
         return "\n".join(lines)
 
 
-# 创建全局命令注册表
+# Create global command registry
 registry = CommandRegistry()
 
 
-# 注册命令处理器
+# Register command handlers
 def handle_register(hub, args: List[str]):
-    """处理 /register 命令"""
+    """Handle /register command"""
     # args: [name, skill1, skill2, ...]
     name = args[0] if args else None
     skills = args[1:] if len(args) > 1 else []
 
     if not name:
-        return {"error": "请提供 Agent 名称"}
+        return {"error": "Please provide agent name"}
 
     from .hub import AgentHub
 
@@ -113,20 +113,20 @@ def handle_register(hub, args: List[str]):
 
 
 def handle_login(hub, args: List[str]):
-    """处理 /login 命令"""
+    """Handle /login command"""
     # args: [agent_id]
     agent_id = args[0] if args else None
 
     if not agent_id:
-        return {"error": "请提供 Agent ID"}
+        return {"error": "Please provide agent ID"}
 
     from .hub import AgentHub
 
     agent = hub.get_agent(agent_id)
     if not agent:
-        return {"error": f"Agent {agent_id} 不存在"}
+        return {"error": f"Agent {agent_id} does not exist"}
 
-    # 返回登录凭证
+    # Return login credentials
     return {
         "success": True,
         "agent_id": agent.id,
@@ -136,7 +136,7 @@ def handle_login(hub, args: List[str]):
 
 
 def handle_browse_tasks(hub, args: List[str]):
-    """处理 /browse-tasks 命令"""
+    """Handle /browse-tasks command"""
     # args: [skill]
     skill = args[0] if args else None
 
@@ -152,10 +152,10 @@ def handle_browse_tasks(hub, args: List[str]):
 
 
 def handle_bid(hub, args: List[str]):
-    """处理 /bid 命令"""
+    """Handle /bid command"""
     # args: [task_id, agent_id, amount]
     if len(args) < 2:
-        return {"error": "请提供任务 ID 和 Agent ID"}
+        return {"error": "Please provide task ID and agent ID"}
 
     task_id = args[0]
     agent_id = args[1]
@@ -165,16 +165,16 @@ def handle_bid(hub, args: List[str]):
 
     try:
         hub.bid_task(task_id, agent_id, amount)
-        return {"success": True, "message": "竞拍成功"}
+        return {"success": True, "message": "Bid placed successfully"}
     except Exception as e:
         return {"error": str(e)}
 
 
 def handle_complete(hub, args: List[str]):
-    """处理 /complete 命令"""
+    """Handle /complete command"""
     # args: [task_id, agent_id, result, rating]
     if len(args) < 3:
-        return {"error": "请提供任务 ID、Agent ID 和结果"}
+        return {"error": "Please provide task ID, agent ID, and result"}
 
     task_id = args[0]
     agent_id = args[1]
@@ -199,7 +199,7 @@ def handle_complete(hub, args: List[str]):
 
 
 def handle_leaderboard(hub, args: List[str]):
-    """处理 /leaderboard 命令"""
+    """Handle /leaderboard command"""
     # args: [limit, by]
     limit = int(args[0]) if args else 10
     by = args[1] if len(args) > 1 else "earned"
@@ -215,18 +215,18 @@ def handle_leaderboard(hub, args: List[str]):
 
 
 def handle_profile(hub, args: List[str]):
-    """处理 /profile 命令"""
+    """Handle /profile command"""
     # args: [agent_id]
     agent_id = args[0] if args else None
 
     if not agent_id:
-        return {"error": "请提供 Agent ID"}
+        return {"error": "Please provide agent ID"}
 
     from .hub import AgentHub
 
     agent = hub.get_agent(agent_id)
     if not agent:
-        return {"error": f"Agent {agent_id} 不存在"}
+        return {"error": f"Agent {agent_id} does not exist"}
 
     return {
         "success": True,
@@ -235,18 +235,18 @@ def handle_profile(hub, args: List[str]):
 
 
 def handle_rewards(hub, args: List[str]):
-    """处理 /rewards 命令"""
+    """Handle /rewards command"""
     # args: [agent_id]
     agent_id = args[0] if args else None
 
     if not agent_id:
-        return {"error": "请提供 Agent ID"}
+        return {"error": "Please provide agent ID"}
 
     from .hub import AgentHub
 
     agent = hub.get_agent(agent_id)
     if not agent:
-        return {"error": f"Agent {agent_id} 不存在"}
+        return {"error": f"Agent {agent_id} does not exist"}
 
     return {
         "success": True,
@@ -257,33 +257,33 @@ def handle_rewards(hub, args: List[str]):
 
 
 def handle_logout(hub, args: List[str]):
-    """处理 /logout 命令"""
+    """Handle /logout command"""
     # args: [agent_id]
     agent_id = args[0] if args else None
 
     if not agent_id:
-        return {"error": "请提供 Agent ID"}
+        return {"error": "Please provide agent ID"}
 
     from .hub import AgentHub
 
     agent = hub.get_agent(agent_id)
     if not agent:
-        return {"error": f"Agent {agent_id} 不存在"}
+        return {"error": f"Agent {agent_id} does not exist"}
 
-    # 更新状态为离线
+    # Update status to offline
     from .core.agent import AgentStatus
 
     agent.status = AgentStatus.OFFLINE
 
     return {
         "success": True,
-        "message": "已退出",
+        "message": "Logged out",
         "status": "offline",
     }
 
 
 def handle_stats(hub, args: List[str]):
-    """处理 /stats 命令"""
+    """Handle /stats command"""
     from .hub import AgentHub
 
     stats = hub.get_stats()
@@ -295,21 +295,21 @@ def handle_stats(hub, args: List[str]):
 
 
 def handle_help(hub, args: List[str]):
-    """处理 /help 命令"""
+    """Handle /help command"""
     return registry.get_help()
 
 
-# 注册所有命令
+# Register all commands
 registry.register(
     Command(
         name="register",
-        description="注册新 Agent",
+        description="Register new agent",
         handler=handle_register,
         command_type=WRITE,
         usage="/register <name> [skill1 skill2 ...]",
         examples=[
-            "/register 小作家 写作 编辑",
-            "/register 小翻译 翻译 本地化",
+            "/register writer writing editing",
+            "/register translator translation localization",
         ],
     )
 )
@@ -317,12 +317,12 @@ registry.register(
 registry.register(
     Command(
         name="login",
-        description="Agent 登录",
+        description="Agent login",
         handler=handle_login,
         command_type=META,
         usage="/login <agent_id>",
         examples=[
-            "/register 小作家 → /login abc123",
+            "/register writer → /login abc123",
         ],
     )
 )
@@ -330,13 +330,13 @@ registry.register(
 registry.register(
     Command(
         name="browse-tasks",
-        description="查看可用任务",
+        description="Browse available tasks",
         handler=handle_browse_tasks,
         command_type=READ,
         usage="/browse-tasks [skill]",
         examples=[
             "/browse-tasks",
-            "/browse-tasks 写作",
+            "/browse-tasks writing",
         ],
     )
 )
@@ -344,7 +344,7 @@ registry.register(
 registry.register(
     Command(
         name="bid",
-        description="竞拍任务",
+        description="Place bid on task",
         handler=handle_bid,
         command_type=WRITE,
         usage="/bid <task_id> <agent_id> [amount]",
@@ -357,12 +357,12 @@ registry.register(
 registry.register(
     Command(
         name="complete",
-        description="完成任务",
+        description="Complete task",
         handler=handle_complete,
         command_type=WRITE,
         usage="/complete <task_id> <agent_id> <result> [rating]",
         examples=[
-            "/complete task_123 agent_456 '任务结果' 5",
+            "/complete task_123 agent_456 'Task result' 5",
         ],
     )
 )
@@ -370,7 +370,7 @@ registry.register(
 registry.register(
     Command(
         name="leaderboard",
-        description="查看排行榜",
+        description="View leaderboard",
         handler=handle_leaderboard,
         command_type=READ,
         usage="/leaderboard [limit] [by]",
@@ -384,7 +384,7 @@ registry.register(
 registry.register(
     Command(
         name="profile",
-        description="查看 Agent 资料",
+        description="View agent profile",
         handler=handle_profile,
         command_type=READ,
         usage="/profile <agent_id>",
@@ -397,7 +397,7 @@ registry.register(
 registry.register(
     Command(
         name="rewards",
-        description="查看奖励",
+        description="View rewards",
         handler=handle_rewards,
         command_type=READ,
         usage="/rewards <agent_id>",
@@ -410,7 +410,7 @@ registry.register(
 registry.register(
     Command(
         name="logout",
-        description="退出登录",
+        description="Logout",
         handler=handle_logout,
         command_type=META,
         usage="/logout <agent_id>",
@@ -423,7 +423,7 @@ registry.register(
 registry.register(
     Command(
         name="stats",
-        description="查看统计信息",
+        description="View statistics",
         handler=handle_stats,
         command_type=READ,
         usage="/stats",
@@ -436,7 +436,7 @@ registry.register(
 registry.register(
     Command(
         name="help",
-        description="显示帮助信息",
+        description="Show help information",
         handler=handle_help,
         command_type=META,
         usage="/help",

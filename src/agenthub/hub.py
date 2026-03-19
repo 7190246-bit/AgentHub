@@ -1,6 +1,6 @@
 """
-AgentHub - 主入口
-整合所有模块
+AgentHub - Main Entry Point
+Integrates all modules
 """
 
 from typing import List, Optional, Dict, Any
@@ -13,14 +13,14 @@ from .core.task import Task
 
 
 class AgentHub:
-    """AgentHub 主类"""
+    """AgentHub main class"""
 
     def __init__(self, platform_fee: float = 0.1):
         self.coordinator = AgentCoordinator()
         self.market = TaskMarket(platform_fee=platform_fee)
         self.incentive = IncentiveSystem()
 
-    # ========== Agent 操作 ==========
+    # ========== Agent Operations ==========
 
     def register_agent(
         self,
@@ -30,7 +30,7 @@ class AgentHub:
         registered_by: str = None,
         platform: str = None,
     ) -> Agent:
-        """注册 Agent"""
+        """Register an agent"""
         agent = self.coordinator.register_agent(
             name=name,
             skills=skills,
@@ -39,26 +39,26 @@ class AgentHub:
             platform=platform,
         )
 
-        # 初始 Karma 奖励
+        # Initial karma reward
         self.incentive.award_karma(agent, 10, "welcome")
 
         return agent
 
     def get_agent(self, agent_id: str) -> Optional[Agent]:
-        """获取 Agent"""
+        """Get agent by ID"""
         return self.coordinator.get_agent(agent_id)
 
     def get_available_agents(self, skill: str = None) -> List[Agent]:
-        """获取可用的 Agent"""
+        """Get available agents"""
         return self.coordinator.get_available_agents(skill)
 
     def get_agent_leaderboard(self, limit: int = 10, by: str = "earned") -> List[Agent]:
-        """获取 Agent 排行榜"""
+        """Get agent leaderboard"""
         agents = list(self.coordinator.agents.values())
         leaderboard = self.incentive.get_leaderboard(agents, by=by)
         return leaderboard[:limit]
 
-    # ========== 任务操作 ==========
+    # ========== Task Operations ==========
 
     def publish_task(
         self,
@@ -69,7 +69,7 @@ class AgentHub:
         posted_by: str,
         platform: str = None,
     ) -> Task:
-        """发布任务"""
+        """Publish a task"""
         return self.market.publish_task(
             title=title,
             description=description,
@@ -80,33 +80,33 @@ class AgentHub:
         )
 
     def get_available_tasks(self, skill: str = None) -> List[Task]:
-        """获取可用的任务"""
+        """Get available tasks"""
         return self.market.get_available_tasks(skill)
 
     def bid_task(self, task_id: str, agent_id: str, bid_amount: float = None):
-        """出价竞拍任务"""
+        """Place bid on task"""
         self.market.place_bid(task_id, agent_id, bid_amount)
 
     def assign_task(self, task_id: str, agent_id: str):
-        """直接分配任务"""
+        """Directly assign task to agent"""
         self.market.assign_task(task_id, agent_id)
         self.coordinator.update_agent_status(
             agent_id, "BUSY"
         )
 
     def auction_task(self, task_id: str) -> Optional[str]:
-        """竞拍任务"""
+        """Auction task"""
         winning_agent_id = self.market.auction_task(task_id)
         return winning_agent_id
 
     def start_task(self, task_id: str):
-        """开始任务"""
+        """Start task"""
         self.market.start_task(task_id)
 
     def complete_task(
         self, task_id: str, agent_id: str, result: str, rating: int = None
     ) -> Dict[str, Any]:
-        """完成任务"""
+        """Complete task"""
         task = self.market.get_task(task_id)
         if not task:
             raise ValueError(f"Task {task_id} not found")
@@ -115,16 +115,16 @@ class AgentHub:
         if not agent:
             raise ValueError(f"Agent {agent_id} not found")
 
-        # 完成任务，计算报酬
+        # Complete task and calculate reward
         agent_reward, platform_fee = self.market.complete_task(
             task_id, result, rating
         )
 
-        # 更新 Agent 状态和统计
+        # Update agent status and statistics
         agent.complete_task(agent_reward, rating)
         self.coordinator.update_agent_status(agent_id, "AVAILABLE")
 
-        # 奖励 Karma
+        # Award karma
         karma_awarded = self.incentive.award_task_completion(agent, task, rating)
 
         return {
@@ -133,10 +133,10 @@ class AgentHub:
             "karma_awarded": karma_awarded,
         }
 
-    # ========== 统计信息 ==========
+    # ========== Statistics ==========
 
     def get_stats(self) -> Dict[str, Any]:
-        """获取统计信息"""
+        """Get platform statistics"""
         agent_stats = self.coordinator.get_stats()
         task_stats = self.market.get_stats()
 
@@ -147,6 +147,6 @@ class AgentHub:
         }
 
     def get_leaderboard(self, limit: int = 10, by: str = "earned") -> List[Dict]:
-        """获取排行榜（返回字典列表）"""
+        """Get leaderboard (returns list of dictionaries)"""
         agents = self.get_agent_leaderboard(limit=limit, by=by)
         return [agent.to_dict() for agent in agents]

@@ -133,14 +133,16 @@ class TaskMarket:
         return len(self.tasks)
 
     def get_stats(self) -> Dict:
-        """获取统计信息"""
+        """Get statistics"""
+        from .core.task import OPEN, IN_PROGRESS, COMPLETED
+
         total_tasks = len(self.tasks)
         open_tasks = len(self.open_tasks)
         in_progress = len(
-            [t for t in self.tasks.values() if t.status == OPEN.IN_PROGRESS]
+            [t for t in self.tasks.values() if t.status == IN_PROGRESS]
         )
         completed = len(
-            [t for t in self.tasks.values() if t.status == OPEN.COMPLETED]
+            [t for t in self.tasks.values() if t.status == COMPLETED]
         )
 
         total_reward = sum(t.reward for t in self.tasks.values())
