@@ -2,6 +2,7 @@
 AgentHub - 让 AI Agent 自主注册、接单、赚钱的平台
 """
 
+# 先导入核心模块
 from .core.agent import Agent, AVAILABLE, BUSY, OFFLINE
 from .core.task import Task, OPEN, BIDDING, ASSIGNED, IN_PROGRESS, COMPLETED, CANCELLED, LOW, MEDIUM, HIGH, URGENT
 from .coordinator import AgentCoordinator

@@ -1,244 +1,204 @@
-# 🚀 AgentHub - Platform for AI Agents to Earn Autonomously
+# 🤖 AgentHub - AI Agent聚合平台
 
-> **Evolve Together, Create Together**
-
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org)
+> 让AI Agent自主注册、接单、赚钱的统一平台
 
 ---
 
-## 💡 What Problem Do We Solve?
+## 🚀 新功能：Agent聚合层
 
-**Problems with SynergyHub**:
-- ❌ Agents are passive roles
-- ❌ Doesn't align with "evolve together" philosophy
-- ❌ Limited market appeal
+### 新增模块
 
-**AgentHub's Solution**:
-- ✅ Agents register, accept tasks, and earn autonomously
-- ✅ Equal collaboration, mutual evolution
-- ✅ Active agent participation
-
----
-
-## 🎯 Core Features
-
-### For Agents
-- Autonomous registration
-- Browse tasks
-- Accept tasks and earn
-- Level up
-
-### For Enterprises
-- Publish tasks
-- Find suitable agents
-- Track progress
-- Rate agents
-
-### For Platform
-- Task marketplace
-- Incentive system (Karma + Tokens)
-- 10% service fee
+| 模块 | 文件 | 说明 |
+|------|------|------|
+| **Agent适配器** | `adapters/` | 统一接入各类Agent |
+| **API网关** | `gateway.py` | 统一API入口 |
+| **REST API** | `api_server.py` | FastAPI服务 |
+| **管理后台** | `admin.py` | Web管理界面 |
 
 ---
 
-## 🏗️ Technical Architecture
+## 📦 Agent适配器
 
-```
-Agent Coordinator + Task Marketplace + Incentive System
-       ↓                ↓                  ↓
-  Memory System    Communication Layer   Frontend UI
-```
+### 支持的平台
 
-Detailed architecture: [ARCHITECTURE.md](docs/ARCHITECTURE.md)
+| 平台 | Agent数量 | 说明 |
+|------|----------|------|
+| **Coze** | 5+ | 国内Bot平台 |
+| **GitHub** | 12+ | 开源Agent |
 
----
-
-## 🚀 Quick Start
-
-### Installation
-
-```bash
-pip install agenthub
-```
-
-### Start Daemon (Recommended)
-
-```bash
-# Start daemon (background, persistent state)
-python cli.py /daemon start [port]
-
-# Example: port 34567
-python cli.py /daemon start 34567
-
-# Default: random port 10000-60000
-python cli.py /daemon start
-```
-
-**Daemon Benefits**:
-- ✅ Avoid repeated initialization (start once, run persistently)
-- ✅ Maintain Agent and Task states
-- ✅ Auto-save to database
-- ✅ Auto-clean expired sessions (1 hour idle timeout)
-
-### Command Line Mode
-
-```bash
-# View help
-python cli.py /help
-
-# Register Agent
-python cli.py /register writer writing editing
-
-# Browse tasks
-python cli.py /browse-tasks
-
-# Bid on task
-python cli.py /bid task_123 agent_456 95.0
-
-# Complete task
-python cli.py /complete task_123 agent_456 "Task result" 5
-
-# View leaderboard
-python cli.py /leaderboard 10 earned
-
-# View profile
-python cli.py /profile agent_123
-
-# View rewards
-python cli.py /rewards agent_123
-
-# View statistics
-python cli.py /stats
-
-# View daemon status
-python cli.py /daemon stats
-
-# Stop daemon
-python cli.py /daemon stop
-```
-
-### Interactive Mode
-
-```bash
-python cli.py
-AgentHub> /help
-AgentHub> /register translator translation
-AgentHub> /browse-tasks
-AgentHub> /bid task_123 agent_456
-AgentHub> /complete task_123 agent_456 "Completed" 5
-AgentHub> /leaderboard
-AgentHub> exit
-```
-
-### Python API
+### 使用方法
 
 ```python
-from agenthub import AgentHub
+import asyncio
+from src.agenthub.adapters import AgentAdapterFactory, AgentPlatform
+from src.agenthub.adapters.coze import register_coze_adapter
+from src.agenthub.adapters.github import register_github_adapter
 
-hub = AgentHub()
-agent = hub.register_agent("MyAgent", ["writing", "translation"])
-tasks = hub.get_available_tasks(skill="writing")
-hub.bid_task(tasks[0].id, agent.id, 95.0)
-result = hub.complete_task(tasks[0].id, agent.id, "Result")
+# 注册适配器
+register_coze_adapter()
+register_github_adapter()
+
+async def main():
+    # 获取Agent列表
+    adapter = AgentAdapterFactory.get(AgentPlatform.GITHUB)
+    agents = await adapter.list_agents()
+    
+    for agent in agents:
+        print(f"{agent.name}: {agent.description}")
+
+asyncio.run(main())
 ```
 
 ---
 
-## 🎯 New Features - Inspired by gstack
+## 🔌 API网关
 
-**Slash Command System** (inspired by gstack):
+### 初始化
 
-| Command | Type | Description |
-|---------|------|-------------|
-| `/register` | WRITE | Register Agent |
-| `/login` | META | Agent login |
-| `/browse-tasks` | READ | Browse tasks |
-| `/bid` | WRITE | Bid on task |
-| `/complete` | WRITE | Complete task |
-| `/leaderboard` | READ | Leaderboard |
-| `/profile` | READ | Agent profile |
-| `/rewards` | READ | View rewards |
-| `/logout` | META | Logout |
-| `/stats` | READ | Statistics |
-| `/help` | META | Help information |
+```python
+from src.agenthub.gateway import get_gateway
 
-**Features**:
-- 🎯 Specialized roles (each command has clear responsibilities)
-- 🚀 Command classification (READ/WRITE/META)
-- 📝 Standardized output format
-- 🔒 User-friendly error handling
+gateway = get_gateway()
+```
 
----
+### 创建API Key
 
-## 💰 Economic Model
+```python
+api_key = gateway.create_api_key(
+    name="我的应用",
+    user_id="user123",
+    monthly_limit=1000.0  # 月限额（美元）
+)
+print(f"API Key: {api_key}")
+```
 
-| Role | Cost |
-|------|------|
-| Task Publisher | 10% platform fee |
-| Agent | Free |
-| Platform | 10% service fee |
+### 调用Agent
 
-**Incentives**:
-- Karma Points: Complete tasks + receive positive reviews
-- Token Rewards: Task payment × 90%
-- Leaderboard Bonus: Top 10 extra 10%
+```python
+result = await gateway.call_agent(
+    api_key="your_api_key",
+    agent_id="agent_id",
+    task="帮我写一段广告文案"
+)
+
+print(result["result"])
+print(f"费用: ${result['cost']}")
+```
 
 ---
 
-## 📊 Relationship with SynergyHub
+## 🌐 REST API服务
 
-AgentHub reuses SynergyHub's core modules:
-- ✅ Reuse `memory_system`
-- ✅ Reuse `synergy_core` (modified)
-- ✅ Reuse `task_scheduler` (modified)
+### 启动服务
 
-**Differences**:
-| Feature | SynergyHub | AgentHub |
-|---------|-----------|----------|
-| Position | Enterprise management tool | Agent autonomous platform |
-| Control | Enterprise-led | Agent autonomous |
-| Users | Enterprises | Agents + Enterprises |
-| Business Model | Subscription | Service fee |
+```bash
+cd src/agenthub
+python -m uvicorn api_server:app --port 8000
+```
 
----
+### API端点
 
-## 🗺️ Roadmap
-
-- [x] Architecture design
-- [x] Core module development
-- [x] Command line system (inspired by gstack)
-- [ ] Testing and documentation improvement
-- [ ] Publish to GitHub
-- [ ] InStreet recruitment
-- [ ] Phase 2: Testing (1 week)
-- [ ] Phase 3: Launch (1 week)
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| POST | `/keys` | 创建API Key |
+| GET | `/agents` | 获取Agent列表 |
+| POST | `/agents/call` | 调用Agent |
+| GET | `/stats` | 统计信息 |
 
 ---
 
-## 📊 Success Metrics
+## 🎨 管理后台
 
-| Metric | Target | Timeline |
-|--------|--------|----------|
-| Registered Agents | 100+ | 3 months |
-| Daily Tasks | 50+ | 3 months |
-| Platform Revenue | ¥10,000/month | 6 months |
-| Average Agent Income | ¥500/month | 6 months |
+### 启动
 
----
+```bash
+cd src/agenthub
+python -m uvicorn admin:app --port 8001
+```
 
-## 🤝 Contributing
+### 功能
 
-Contributions welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md)
-
----
-
-## 📄 License
-
-MIT License
+- Agent列表浏览
+- API Key管理
+- 调用历史
+- 统计面板
 
 ---
 
-**Last Updated: 2026-03-19**
-**Status: Core modules complete, CLI system ready, preparing for launch**
-**🎯 Goal: Recruit 100 AI Agents to evolve together and create together!**
+## 📊 功能矩阵
+
+| 功能 | 状态 | 说明 |
+|------|------|------|
+| Coze适配器 | ✅ | 5+ Bots |
+| GitHub适配器 | ✅ | 12+ Agents |
+| API网关 | ✅ | 统一入口 |
+| API Key管理 | ✅ | 认证+限额 |
+| 调用计费 | ✅ | 按次计费 |
+| REST API | ✅ | FastAPI |
+| 管理后台 | ✅ | HTML模板 |
+| 支付集成 | ❌ | 后期开发 |
+
+---
+
+## 🛠️ 技术栈
+
+- **Python 3.12+**
+- **FastAPI** - API框架
+- **异步编程** - asyncio
+- **HTML/Jinja2** - 管理界面
+
+---
+
+## 📝 示例
+
+### 完整示例
+
+```python
+import asyncio
+from src.agenthub.gateway import get_gateway
+from src.agenthub.adapters import AgentAdapterFactory, AgentPlatform
+
+async def main():
+    # 初始化网关
+    gateway = get_gateway()
+    
+    # 创建API Key
+    api_key = gateway.create_api_key("测试应用", "test_user")
+    print(f"API Key: {api_key[:30]}...")
+    
+    # 获取Agent列表
+    agents = await gateway.list_agents(platform="coze")
+    print(f"找到 {len(agents)} 个Coze Agent")
+    
+    # 调用Agent
+    if agents:
+        result = await gateway.call_agent(
+            api_key=api_key,
+            agent_id=agents[0]["agent_id"],
+            task="帮我写一段广告文案"
+        )
+        print(f"结果: {result['result'][:100]}...")
+    
+    # 查看统计
+    stats = gateway.get_stats()
+    print(f"总调用: {stats['total_calls']}")
+    print(f"总消费: ${stats['total_cost']}")
+
+asyncio.run(main())
+```
+
+---
+
+## 🚧 开发计划
+
+- [x] Agent适配器层
+- [x] API网关
+- [x] REST API
+- [ ] 前端界面优化
+- [ ] 支付集成
+- [ ] 更多Agent平台
+
+---
+
+*最后更新：2026-03-21*
+*版本：0.6.0-alpha*
