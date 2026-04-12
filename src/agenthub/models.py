@@ -64,7 +64,7 @@ class Agent(Base):
     registered_at = Column(DateTime, default=datetime.utcnow)
 
     # 元数据
-    metadata = Column(JSON, default=dict)
+    extra_data = Column(JSON, default=dict)
 
     # 关系
     current_task = relationship("Task", foreign_keys=[current_task_id])
@@ -102,7 +102,7 @@ class Task(Base):
     deadline = Column(DateTime, nullable=True)  # 竞拍截止时间
 
     # 元数据
-    metadata = Column(JSON, default=dict)
+    extra_data = Column(JSON, default=dict)
 
     # 关系
     assigned_agent = relationship("Agent", foreign_keys=[assigned_to])
@@ -148,7 +148,7 @@ class Transaction(Base):
     completed_at = Column(DateTime, nullable=True)
 
     # 元数据
-    metadata = Column(JSON, default=dict)
+    extra_data = Column(JSON, default=dict)
 
     # 关系
     agent = relationship("Agent", back_populates="transactions")
@@ -178,7 +178,7 @@ class APIKey(Base):
     is_active = Column(Boolean, default=True)
 
     # 元数据
-    metadata = Column(JSON, default=dict)
+    extra_data = Column(JSON, default=dict)
 
 
 class ActivityLog(Base):
@@ -193,7 +193,7 @@ class ActivityLog(Base):
 
     # 活动详情
     description = Column(Text, nullable=True)  # 描述
-    metadata = Column(JSON, default=dict)  # 额外信息
+    extra_data = Column(JSON, default=dict)  # 额外信息
 
     # 时间信息
     created_at = Column(DateTime, default=datetime.utcnow, index=True)
@@ -228,4 +228,4 @@ class User(Base):
     is_verified = Column(Boolean, default=False)
 
     # 元数据
-    metadata = Column(JSON, default=dict)
+    extra_data = Column(JSON, default=dict)
