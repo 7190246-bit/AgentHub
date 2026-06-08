@@ -1,0 +1,84 @@
+{
+  "timestamp": "2026-05-23 06:00:02",
+  "status": "completed",
+  "checks": {
+    "git": {
+      "status": "dirty",
+      "has_changes": true,
+      "recent_commits": 5,
+      "score": 80
+    },
+    "code_quality": {
+      "issues": 0,
+      "issue_list": [],
+      "score": 100
+    },
+    "features": {
+      "features": {
+        "coze_adapter": true,
+        "github_adapter": true,
+        "api_gateway": true,
+        "rest_api": true,
+        "admin_backend": true
+      },
+      "completed": 5,
+      "total": 5,
+      "completion_rate": 100.0,
+      "score": 100.0
+    },
+    "tests": {
+      "test_files": 1,
+      "tests_run": 4,
+      "score": 60
+    },
+    "docs": {
+      "docs": {
+        "README.md": true,
+        "PRIORITY.md": true,
+        "RELEASE_v0.6.0-alpha.md": true,
+        "STRATEGY.md": true,
+        "STRATEGY_CN.md": true
+      },
+      "completed": 5,
+      "total": 5,
+      "score": 100.0
+    },
+    "github": {
+      "has_remote": true,
+      "latest_commit": "e727f66 chore: 添加检测报告到git忽略",
+      "status": "connected",
+      "score": 100
+    },
+    "performance": {
+      "import_time": 0.08781123161315918,
+      "status": "good",
+      "score": 100
+    },
+    "security": {
+      "issues": 1,
+      "issue_list": [
+        "Sensitive data in .env"
+      ],
+      "score": 80
+    },
+    "dependencies": {
+      "dependencies": 15,
+      "status": "ok",
+      "score": 100
+    },
+    "bugs": {
+      "bugs": 3,
+      "bug_list": [
+        "Issues in auto_detect.py",
+        "Issues in logger.py",
+        "Issues in coze.py"
+      ],
+      "score": 85
+    }
+  },
+  "overall_score": 90.5,
+  "improvements": {
+    "files_changed": 0,
+    "actions": []
+  }
+}
