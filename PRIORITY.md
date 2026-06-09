@@ -235,3 +235,17 @@
 - security: 80/100
 - dependencies: 100/100
 - bugs: 85/100
+
+
+## 📊 检测报告 - 2026-06-09 18:01:08.753288
+总体分数: 87.5/100
+- git: 80/100
+- code_quality: 100/100
+- features: 100.0/100
+- tests: 60/100
+- docs: 100.0/100
+- github: 100/100
+- performance: 70/100
+- security: 80/100
+- dependencies: 100/100
+- bugs: 85/100
